@@ -1,6 +1,6 @@
 # Connector build steps
 
-This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project has a generated Next.js interface plus Step 01 contracts and verification setup in [`lib/contracts`](../../connector/lib/contracts/README.md). Step 02 adds fictional records and a server-side adapter in [`lib/data`](../../connector/lib/data/README.md). Step 03 adds server-controlled demo identity and site access in [`lib/access`](../../connector/lib/access/README.md), pending review. Tool behavior and HTTP endpoints are not implemented. The checklist records reviewer acceptance, not the presence of implementation files.
+This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project has a generated Next.js interface, shared contracts in [`lib/contracts`](../../connector/lib/contracts/README.md), fictional records and an adapter in [`lib/data`](../../connector/lib/data/README.md), and demo identity and site access in [`lib/access`](../../connector/lib/access/README.md). Step 04 adds the material balance tool in [`lib/tools`](../../connector/lib/tools/README.md), pending review. HTTP endpoints are not implemented. The checklist records reviewer acceptance, not the presence of implementation files.
 
 ## How to use this checklist
 
@@ -14,7 +14,7 @@ This folder is the implementation plan for the read-only connector proposed in [
 
 - [x] **01 — [Contracts and verification setup](01-contracts-and-verification.md)**: define shared data and tool contracts, validation, and the test setup.
 - [x] **02 — [Sample records and data adapter](02-sample-data-adapter.md)**: add fictional two-site, two-user data behind a replaceable adapter.
-- [ ] **03 — [Demo identity and site access](03-identity-and-site-access.md)**: establish the demo user on the server and enforce site permissions.
+- [x] **03 — [Demo identity and site access](03-identity-and-site-access.md)**: establish the demo user on the server and enforce site permissions.
 - [ ] **04 — [Material balance tool](04-material-balance.md)**: calculate recorded stock with units, timestamps, and sources.
 - [ ] **05 — [Pending deliveries tool](05-pending-deliveries.md)**: return open deliveries and quantities still expected.
 - [ ] **06 — [Delivery evidence tool](06-delivery-evidence.md)**: independently authorise and display supporting sample evidence.
