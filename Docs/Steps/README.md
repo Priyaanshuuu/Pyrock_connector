@@ -1,6 +1,6 @@
 # Connector build steps
 
-This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project has a generated Next.js interface, shared contracts in [`lib/contracts`](../../connector/lib/contracts/README.md), fictional records and an adapter in [`lib/data`](../../connector/lib/data/README.md), demo identity and site access in [`lib/access`](../../connector/lib/access/README.md), and the three read-only tools in [`lib/tools`](../../connector/lib/tools/README.md). Step 06 is pending review. HTTP endpoints are not implemented. The checklist records reviewer acceptance, not the presence of implementation files.
+This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project has a generated Next.js interface, shared contracts in [`lib/contracts`](../../connector/lib/contracts/README.md), fictional records and an adapter in [`lib/data`](../../connector/lib/data/README.md), demo identity and site access in [`lib/access`](../../connector/lib/access/README.md), and the three read-only tools in [`lib/tools`](../../connector/lib/tools/README.md). Step 07 adds HTTP routes for those tools, pending review. The checklist records reviewer acceptance, not the presence of implementation files.
 
 ## How to use this checklist
 
@@ -17,7 +17,7 @@ This folder is the implementation plan for the read-only connector proposed in [
 - [x] **03 — [Demo identity and site access](03-identity-and-site-access.md)**: establish the demo user on the server and enforce site permissions.
 - [x] **04 — [Material balance tool](04-material-balance.md)**: calculate recorded stock with units, timestamps, and sources.
 - [x] **05 — [Pending deliveries tool](05-pending-deliveries.md)**: return open deliveries and quantities still expected.
-- [ ] **06 — [Delivery evidence tool](06-delivery-evidence.md)**: independently authorise and display supporting sample evidence.
+- [x] **06 — [Delivery evidence tool](06-delivery-evidence.md)**: independently authorise and display supporting sample evidence.
 - [ ] **07 — [HTTP tool endpoints](07-http-tool-endpoints.md)**: expose the shared tool logic through Next.js Route Handlers.
 - [ ] **08 — [Sample-data demo interface](08-demo-interface.md)**: build reviewable stock, delivery, and evidence views.
 - [ ] **09 — [Failure handling and outcome logging](09-failures-and-logging.md)**: make missing, stale, denied, and failed requests clear and record safe operational outcomes.
