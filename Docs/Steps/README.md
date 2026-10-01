@@ -1,6 +1,6 @@
 # Connector build steps
 
-This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project is a generated Next.js starter. These files describe planned work; they do not mean a step has begun or that a feature exists.
+This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The current `connector/` project has a generated Next.js interface plus Step 01 contracts and verification setup in [`lib/contracts`](../../connector/lib/contracts/README.md). Tool behavior, data adapters, and HTTP endpoints are not implemented. The checklist records reviewer acceptance, not the presence of implementation files.
 
 ## How to use this checklist
 

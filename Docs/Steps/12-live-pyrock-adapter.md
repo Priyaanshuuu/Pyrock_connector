@@ -9,7 +9,6 @@ Map the approved API's sites, stock records, pending deliveries, and evidence in
 Handle upstream timeouts and revoked access, and avoid durable copies of customer records unless explicitly required and approved. Do not put credentials or evidence links in browser code. This step needs a detailed API-specific plan after the contract is available.
 
 ## Done when
-
 - The live adapter passes the shared tool and access tests against an approved test environment.
 - Inventory calculations and evidence access agree with Pyrock's definitions.
 - A reviewer can distinguish live-data mode from the fictional sample demo.
