@@ -1,70 +1,64 @@
-# The solution, stack and reasons
+# What I would build and why I’d use this stack
 
-## Proposed solution
+Proposal by Priyanshu Sinha · October 1, 2026
 
-Build a small gateway between an external assistant and Pyrock's authorised construction records. The assistant translates a question into a tool request. The gateway checks access, queries the records and returns structured results with evidence and freshness.
+I’d build a small connector that lets an authorised assistant query construction records and return an answer with supporting evidence. For the prototype, I’d use Next.js for both the demo interface and API endpoints. This keeps the first version in one project and lets me spend more time on the actual workflow.
 
-Simple explanation: assistant sawaal poochega; connector permission check karega; Pyrock ke records se jawaab aayega.
+## The first three tools
 
-This proposal focuses on a connector. Building a new WhatsApp ingestion system or replacing Pyrock's inventory engine is outside the initial scope.
+| Tool I would expose | What it answers |
+|---|---|
+| get_material_balance | How much of a material is recorded at a site, and when was it updated? |
+| list_pending_deliveries | Which deliveries are open, and how much is still expected? |
+| get_delivery_evidence | Which permitted invoice or message supports this delivery record? |
 
-## First prototype
+These are proposed tool names, not endpoints I know exist in Pyrock.
 
-Use clearly labelled synthetic records for two sites and two demo users with different permissions. Implement three read-only tools:
+I’d keep the first version read-only. That gives us a useful starting point without needing to design record changes or supplier messaging immediately.
 
-| Proposed tool | Inputs | Output |
+## The stack I would use
+
+| Component | Choice | Why I would use it |
 |---|---|---|
-| get_material_balance | site_id, material_id | Recorded quantity, unit, as_of time, evidence references, warnings |
-| list_pending_deliveries | site_id, optional due_before, cursor | Authorised open deliveries, expected dates, received/remaining quantities, next cursor |
-| get_delivery_evidence | delivery_id | Permitted source records and revision references |
+| Interface | Next.js App Router + Tailwind | A simple demo with stock, deliveries and evidence views. |
+| Backend | Next.js Route Handlers | Host connector endpoints in the same project. |
+| Language | TypeScript | Keep tool inputs, records and results consistent across the application. |
+| Validation | Zod | Check request arguments and response data at runtime. |
+| Initial data | Server-side sample fixtures | Show the workflow without requiring your private API or a database setup. |
+| Persistent storage, if needed | Hosted SQL database | Store related sites, deliveries and evidence when persistence becomes useful. |
+| Data access | A separate TypeScript adapter | Replace sample records with an approved Pyrock API later. |
+| Tests | Vitest + API checks | Check access boundaries, expected answers and failure handling. |
+| Demo hosting | Vercel, if deployment is feasible | Publish the Next.js sample demo for easy review. |
 
-Derive tenant and user identity from verified authentication. Never trust an assistant-supplied tenant_id as proof of access. Tool names are our proposed contract, not existing Pyrock endpoints.
+I would start with sample fixtures, so a database is not required for the first demonstration. If persistence is added, I would choose storage supported by the deployment environment; local SQLite files should not be treated as durable storage on a serverless deployment.
 
-An example result should say “450 bags recorded received; 50 pending; records updated at 10:30” rather than imply physical stock has been independently verified.
+Next.js gives me routing, server-side code and API endpoints. The connector itself comes from the tool contracts, permission checks and data adapter I build around it.
 
-## Recommended stack
+## Keeping the implementation easy to integrate
 
-| Part | Proposed choice | Why |
-|---|---|---|
-| Language | TypeScript | Fits the user's skills and Pyrock's advertised hiring stack. |
-| Demo interface | React + Vite | Simple question/result interface and trace viewer. |
-| Gateway | Cloudflare Worker | Small authenticated API with a deployment path aligned to their advertised stack. |
-| Input validation | Zod | Validate tool arguments and response contracts at runtime. |
-| Demo records | D1/SQLite | Relational sample records with explicit site and delivery relationships. |
-| Sample attachments | R2, only if needed | Store synthetic bills; return authorised short-lived access. |
-| Data access | Adapter interface | Switch from synthetic data to an approved Pyrock API without rewriting tools. |
-| Verification | Vitest and API-level checks | Exercise permissions, contracts, pagination and failure behaviour. |
+I’d keep the stock queries, permission checks and tool logic in plain TypeScript modules. Next.js would provide the HTTP entry point and interface. That way, if you prefer to host the service on Cloudflare Workers, the business logic can be reused while the hosting layer is adapted and tested.
 
-Pyrock's junior hiring material names React, TypeScript, Workers, Durable Objects, D1/SQLite, R2 and Workflows. It does not establish that every component is required for this connector. [1]
+Your recruitment material mentions Cloudflare technologies. I’m choosing Next.js for the first prototype because it fits my experience and keeps delivery simple; this does not require your team to change its existing stack. [1]
 
-Start without queues, vector search, Durable Objects or an autonomous agent loop. The proposed reads are narrow database/API operations. Add durable orchestration only if later workflows require it.
+## Where the data comes from
 
-## Assistant integration strategy
+Initially, a sample-data adapter would return fictional records. With your approval and access, a Pyrock adapter would call your supported API using your inventory definitions and permissions.
 
-Keep business tools separate from transport. First prove the API and a local/demo tool caller. Then implement the selected client's documented connector format. An MCP adapter is an option if the chosen client supports it; do not assume Muse and Dots share an identical protocol.
+The tools would receive the same kind of structured result from either adapter. I would keep a visible sample-data label on the prototype so it cannot be mistaken for a live customer integration.
 
-Meta documents custom connectors. We still need to verify the selected account's availability, authentication requirements and exact integration procedure. Dots compatibility also remains a separate acceptance check. [2]
+## How I would connect an assistant
 
-The connector itself does not require an LLM to calculate stock. Natural-language interpretation belongs in the assistant or an optional demo layer. If a demo layer uses an LLM, label it and use the same restricted tools rather than giving it direct SQL access.
+I would first prove the tools through the demo and API. Then I would add the selected assistant’s documented connector format. MCP is an option if that client supports it; a generic MCP endpoint does not establish compatibility with every assistant.
 
-## Authentication and production boundary
+Meta documents custom connectors, but actual Muse and Dots integration still needs account access, authentication details and testing in the chosen client. [2]
 
-For synthetic demonstration only, use two server-managed demo identities and clearly visible sample-data labels. Do not embed production credentials in the browser.
+The core connector does not need an LLM to calculate stock. If I add natural-language interaction to the demo, the model would select these restricted tools and explain their results. Its credentials would stay server-side.
 
-Before accessing real data, use Pyrock-approved delegated authentication, server-side permission checks, token expiry/revocation and restricted evidence access. Store secrets on the server. A successful synthetic demonstration does not prove a production integration.
+## What I could share first
 
-## Delivery sequence
+A GitHub repository, a small sample-data prototype and a live link if deployment works. As discussed in my email, I would aim to share that by October 2 morning if you approve the direction. A real Pyrock integration would follow once the supported access path is agreed.
 
-1. Define sample records, permissions and expected answers.
-2. Implement the three tools and a mock-data adapter.
-3. Build a minimal question/result and request-trace interface.
-4. Verify allowed and denied cases, stale records and upstream failures.
-5. Publish a repository with setup instructions; deploy a synthetic demo if feasible.
-6. Following Pyrock feedback and access, add the real adapter and one verified client integration.
+## References
 
-The tomorrow-morning commitment should cover a small synthetic prototype, repository and optionally a live demo. Live Pyrock/Muse/Dots integration depends on access and cannot be promised unconditionally.
-
-## Sources
-
-1. [Pyrock junior-role description](https://www.linkedin.com/posts/pyrock-ai_we-are-hiring-a-junior-full-stack-developer-activity-7505316304485158914-fyRN)
+1. [Pyrock junior-role post](https://www.linkedin.com/posts/pyrock-ai_we-are-hiring-a-junior-full-stack-developer-activity-7505316304485158914-fyRN)
 2. [Meta: How Muse works with connectors](https://www.meta.com/en-gb/help/artificial-intelligence/1687253048996149/)

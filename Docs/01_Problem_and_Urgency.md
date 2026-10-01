@@ -1,57 +1,51 @@
-# The problem and why to address it soon
+# Why I’m proposing this connector
 
-Project: Pyrock construction-data connector  
-Author: Priyanshu Sinha  
-Planning date: October 1, 2026  
-Status: Independent proposal; no Pyrock endorsement or private API access assumed.
+Proposal by Priyanshu Sinha · October 1, 2026
 
-## In simple words
+I spent some time looking into Pyrock because I wanted to propose something useful to your team. Your product already handles construction updates, inventory, material leakage and follow-ups through WhatsApp. I’d like to explore how that information could also become accessible through the AI assistants your customers may start using.
 
-Pyrock organises construction updates coming through WhatsApp. Our proposed connector would let an authorised external AI assistant ask Pyrock for that information. Pyrock would remain responsible for its records, access rules and approvals.
+## What has changed
 
-## What we know
+Dots and Muse are making ongoing tasks and connected business workflows easier to access. Meta’s Muse for Small Business announcement also includes custom connectors. That makes it worth asking how a construction owner’s preferred assistant could work with Pyrock. [1–2]
 
-Pyrock publicly advertises inventory, material-leakage detection, daily reports and WhatsApp follow-ups. Its recruitment material mentions message ordering, retries and an existing agent evaluation harness. These areas already belong to their product; we should not present them as newly discovered gaps. [1–3]
+For example, an owner might ask:
 
-OpenAI announced Dots on September 29 as agents for ongoing work with connected apps. Meta announced Muse for Small Business on September 29, including business integrations and custom connectors. [4–5]
+> “Which deliveries are pending at Site A, and how much cement do we have left?”
 
-## The potential business problem
+If the assistant has no connection to Pyrock, the owner needs to open another interface or copy records across. I think a small connector could remove that extra step while keeping Pyrock responsible for the underlying information and access rules.
 
-An owner may increasingly ask one assistant to organise their business. If construction records are inaccessible to that assistant, the owner must switch applications or manually copy information. They might consider simpler tools that connect more easily.
+## Why I think it is worth exploring now
 
-Our hypothesis is that a controlled connector could keep Pyrock useful within this changing workflow. There is no public evidence here of customers leaving Pyrock because of these launches, and a connector alone does not guarantee retention.
+My concern is that customers may increasingly expect basic summaries and reminders from the assistants they already use. My proposal is to make Pyrock’s construction records useful within those workflows, so the assistant can answer from your data instead of relying on whatever the user manually uploads.
 
-Example: an owner asks, “Which cement deliveries at Site A are pending?” A general assistant needs current, authorised operational data to answer accurately. A connector can provide the records, their update times and source references.
+This is a possible opportunity, not evidence that customers are leaving Pyrock. I’d start with a small demonstration and use your feedback to decide whether a deeper integration is worth pursuing.
 
-## Why explore it soon
+## Where I would add value
 
-- New agent launches make interoperability a timely customer-discovery question.
-- A narrow prototype can test usefulness before committing to a broad integration.
-- Establishing consistent tool responses and access rules can help later integrations.
-- Early feedback can prevent building a connector customers do not need.
+I would focus on three things: retrieving the right records, showing the evidence behind an answer, and enforcing the user’s site permissions. An answer should also show when the records were last updated, so a customer can judge how current it is.
 
-The urgency is to validate demand and feasibility. We have no basis to claim Pyrock faces an immediate survival deadline.
+I know you already advertise inventory and leakage detection, and your hiring material mentions reliability work and an agent evaluation harness. I’m proposing an integration around that existing work. [3–4]
 
-## What remains unknown
+## What I would like to confirm with you
 
-| Question | Why it matters |
-|---|---|
-| Does Pyrock already have an API, connector or MCP server? | Avoid duplicating existing work. |
-| Can customer permissions be checked through that API? | Preserve access boundaries. |
-| Are evidence links and update timestamps available? | Support verifiable answers. |
-| Which agent do their customers actually use? | Choose the first integration based on demand. |
-| What authentication and transport does that agent support? | A generic tool endpoint is not automatically compatible. |
+- Do you already have a connector, MCP server or API for external assistants?
+- Can an integration retrieve stock, pending deliveries and supporting evidence?
+- How should it inherit your customer permissions?
+- Are customers actually asking to use another assistant with Pyrock?
 
-## Initial success criteria
+If you already have this on your roadmap, I’d be happy to contribute a missing tool or an integration test rather than duplicate it.
 
-Demonstrate correct stock and pending-delivery answers on labelled sample data, working source references, visible freshness, and denial of requests outside a user's permitted sites. Measure usability and latency. Customer value must subsequently be tested with Pyrock and a willing customer.
+## What I would demonstrate first
 
-## Sources reviewed for this proposal
+I would use clearly labelled sample records for two sites and two demo users. The prototype would answer stock and delivery questions, show sources and update times, and reject requests for sites the user cannot access.
 
-1. [Pyrock product website](https://pyrock.ai/)
-2. [Pyrock careers](https://pyrock.ai/careers/)
-3. [Pyrock company posts](https://in.linkedin.com/company/pyrock-ai)
-4. [OpenAI release notes — September 29](https://help.openai.com/en/articles/6825453-chatgpt-release-notes)
-5. [Meta: Muse for Small Business](https://about.fb.com/news/2026/09/introducing-muse-small-business/)
+That would demonstrate the approach. Real customer usefulness would need to be checked with your team and, ideally, one customer.
 
-Public descriptions establish advertised capabilities, not independently tested production behaviour.
+## References
+
+1. [OpenAI release notes — September 29](https://help.openai.com/en/articles/6825453-chatgpt-release-notes)
+2. [Meta: Muse for Small Business](https://about.fb.com/news/2026/09/introducing-muse-small-business/)
+3. [Pyrock website](https://pyrock.ai/)
+4. [Pyrock careers and company posts](https://pyrock.ai/careers/) · [LinkedIn](https://in.linkedin.com/company/pyrock-ai)
+
+This proposal uses public product descriptions. I have not inspected your private application or code.

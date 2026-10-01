@@ -1,40 +1,48 @@
-# Tradeoffs
+# The choices I would make, and their tradeoffs
 
-These are proposed design decisions, not claims about Pyrock's existing implementation.
+Proposal by Priyanshu Sinha · October 1, 2026
 
-| Decision | Benefit | Cost or limitation | Initial choice |
-|---|---|---|---|
-| Read-only versus write actions | Reads make permissions and correctness easier to demonstrate. | Cannot update records or contact suppliers. | Read-only first; evaluate approved actions later. |
-| Synthetic versus live data | Can develop without customer access or credentials. | Does not prove fit with real records or APIs. | Label synthetic data prominently; validate a real adapter separately. |
-| Direct API versus browser automation | Explicit contracts and scoped access are easier to operate. | Requires a suitable API from Pyrock. | Approved API; no private-app scraping workaround. |
-| Live fetch versus local copy | Live fetch reduces duplicated sensitive data. | Depends on upstream latency and availability. | Fetch live in production; fail clearly when unavailable. |
-| REST versus MCP or proprietary connector | REST gives a simple core; an adapter can support a selected assistant. | Multiple transports mean more maintenance. | One core service; one verified client adapter. |
-| Cloudflare alignment versus portability | Fits advertised stack and gives a plausible handoff path. | Platform bindings create some coupling. | Keep domain logic independent of bindings. |
-| Evidence-rich versus compact responses | Evidence makes results easier to inspect. | Adds payload size and may expose sensitive details. | Concise records with authorised evidence references. |
-| Narrow tools versus generic SQL tool | Narrow tools are easier to validate and restrict. | Each new use case needs explicit work. | Three narrow read tools. |
-| Delegated user access versus broad service credentials | User access preserves existing role boundaries. | More integration effort. | Require delegated or equivalent server-enforced access before real data. |
-| Agent distribution versus owning the interface | Customers can use Pyrock through their chosen assistant. | Pyrock may lose direct interface visibility and depend on another platform. | Keep Pyrock's identity, evidence and authorisation visible in results. |
+I want the first version to be small enough to review and useful enough to test. These are the choices I would make to get there.
 
-## Failure cases worth designing for
+| My choice | What we gain | What we give up or need to check |
+|---|---|---|
+| Next.js for the interface and APIs | One project to develop and deploy. | Your team may prefer a different hosting layer; I’d keep core logic separate. |
+| Sample records first | I can demonstrate the workflow without customer credentials. | It does not prove compatibility with your actual records or API. |
+| Three read-only tools | Clear scope and straightforward permission tests. | Users cannot correct records or message suppliers through the prototype. |
+| Approved API access for live data | Explicit contracts and controlled access. | A suitable API and authentication method need to be available. |
+| Fetch current records when queried | Fewer duplicated customer records in the connector. | Answers depend on the upstream service’s availability and speed. |
+| One assistant integration first | Less maintenance and a clear acceptance test. | Other clients may need separate adapters. |
+| Evidence and timestamps in responses | Customers can inspect an answer and judge its freshness. | Evidence adds payload size and requires its own access controls. |
+| Explicit tools instead of unrestricted SQL | Requests are easier to validate and limit. | New questions may require an additional tool. |
 
-- Wrong site: resolve ambiguity instead of choosing a similarly named site.
-- Missing records: report unavailable data; zero stock is a different result.
-- Stale records: include as_of and freshness status; do not imply current physical stock.
-- Access leak: check both the query and each evidence request against the authenticated identity.
-- Upstream outage: return a retryable error; any cached result must be explicitly labelled with its age.
-- Instructions hidden in evidence: treat documents as data. Their text must not grant permissions or change tool behaviour.
-- Revoked permission: recheck access and invalidate relevant sessions/caches; possession of an old record ID is insufficient.
+## The main limitation
 
-## Changes and approvals, if added later
+This connector can expose records, but it cannot make an incorrect record true. If a receipt is missing or a site update is old, I would return that limitation clearly. “No records available” must remain different from “zero stock.”
 
-Keep “prepare change” separate from “commit change.” An authorised person must approve the exact action and record version. Recheck permission and version at execution time. Reject changed or expired approvals. Record idempotency keys so retried requests do not create duplicate updates.
+I also would not describe a sample-data demo as a working Muse or Dots integration. I’d use that description only after testing the connector in the named client.
 
-Do not imply this approval system already exists or must replace Pyrock's controls. Integrate with their established approval mechanism where available.
+## How I would protect customer access
 
-## What this project cannot guarantee
+For real data, I’d use the authentication approach agreed with your team and check permissions on the server. The assistant cannot grant itself access by sending a company or site ID.
 
-A connector cannot fix incorrect upstream records, prove material physically arrived, guarantee discovery inside an agent marketplace, or prevent customers from choosing another product. It also cannot guarantee hiring. Its value is a concrete demonstration of integration design, permissions, evidence handling and product judgment.
+I’d check evidence access separately, keep credentials out of the browser and avoid public links to customer documents. Instructions inside a document would be treated as document content, not permission to perform an action.
 
-## Proceed or reconsider
+## What I would do when something fails
 
-Proceed to real integration if Pyrock identifies a user need, confirms a supported data-access path and agrees on permissions. If a connector already exists, contribute a missing tool, integration test or reliability fix. If customers do not use external agents, prioritise a workflow they actually request.
+- If a site name is ambiguous, ask the user to choose from authorised matches.
+- If records are missing, report that instead of inventing an answer.
+- If the source is stale, show the last update time.
+- If your API times out, return a clear retryable error.
+- If access is revoked, deny subsequent requests and invalidate relevant sessions or cached access.
+
+## If we add actions later
+
+I would first integrate with your existing approval mechanism. The user would see the exact proposed change and evidence before an authorised reviewer approves it. The server would recheck permission and record version before applying it, and repeated requests would need duplicate protection.
+
+That work would be a later stage. The first prototype would only retrieve information.
+
+## The business tradeoff
+
+Allowing another assistant to present Pyrock’s records could reduce direct use of your interface. It could also make your product easier to use in the customer’s existing workflow. I would keep Pyrock identified as the data source and evaluate the idea with customer feedback rather than assume it will improve retention.
+
+If you already have a connector, I’d focus on a missing tool or reliability test. If customers do not need external-agent access, I’d rather work on a problem your team knows they have.
