@@ -10,6 +10,7 @@ import {
 } from "../contracts";
 import type { DemoAccess } from "../access/demo-access";
 import type { DataAdapter } from "../data/adapter";
+import { staleWarning } from "./freshness";
 
 function failure(
   code: ToolFailure["error"]["code"],
@@ -77,6 +78,9 @@ export async function getDeliveryEvidence(
       recordedAt: evidence.recordedAt,
     }],
     updatedAt: evidence.recordedAt,
-    warnings: adapter.mode === "sample" ? [adapter.label] : [],
+    warnings: [
+      ...(adapter.mode === "sample" ? [adapter.label] : []),
+      ...[staleWarning(evidence.recordedAt)].filter((warning): warning is string => warning !== null),
+    ],
   });
 }

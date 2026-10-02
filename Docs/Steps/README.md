@@ -1,6 +1,6 @@
 # Connector build steps
 
-This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The `connector/` project now has shared contracts, fictional records and an adapter, demo identity and site access, three read-only tools, their HTTP routes, and a reviewer interface described in [`lib/demo`](../../connector/lib/demo/README.md). Step 08 is pending review. The checklist records reviewer acceptance, not the presence of implementation files.
+This folder is the implementation plan for the read-only connector proposed in [the solution](../02_Solution_Stack_and_Why.md), [tradeoffs](../03_Tradeoffs.md), and [flow](../04_Flow.md). The `connector/` project now has shared contracts, fictional records and an adapter, demo identity and site access, three read-only tools, their HTTP routes, and a reviewer interface described in [`lib/demo`](../../connector/lib/demo/README.md). Step 09 adds failure handling and outcome logging. The checklist records reviewer acceptance, not the presence of implementation files.
 
 ## How to use this checklist
 
@@ -19,7 +19,7 @@ This folder is the implementation plan for the read-only connector proposed in [
 - [x] **05 — [Pending deliveries tool](05-pending-deliveries.md)**: return open deliveries and quantities still expected.
 - [x] **06 — [Delivery evidence tool](06-delivery-evidence.md)**: independently authorise and display supporting sample evidence.
 - [x] **07 — [HTTP tool endpoints](07-http-tool-endpoints.md)**: expose the shared tool logic through Next.js Route Handlers.
-- [ ] **08 — [Sample-data demo interface](08-demo-interface.md)**: build reviewable stock, delivery, and evidence views.
+- [x] **08 — [Sample-data demo interface](08-demo-interface.md)**: build reviewable stock, delivery, and evidence views.
 - [ ] **09 — [Failure handling and outcome logging](09-failures-and-logging.md)**: make missing, stale, denied, and failed requests clear and record safe operational outcomes.
 - [ ] **10 — [Prototype verification and documentation](10-prototype-verification.md)**: verify the full flow and document setup, contracts, and limits.
 

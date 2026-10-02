@@ -10,6 +10,7 @@ import {
 } from "../contracts";
 import type { DemoAccess } from "../access/demo-access";
 import type { DataAdapter } from "../data/adapter";
+import { staleWarning } from "./freshness";
 
 function failure(
   code: ToolFailure["error"]["code"],
@@ -77,6 +78,8 @@ export async function getMaterialBalance(
   }));
   const updatedAt = latestTimestamp(movements);
   const sampleWarning = adapter.mode === "sample" ? [adapter.label] : [];
+  const stale = staleWarning(updatedAt);
+  if (stale) sampleWarning.push(stale);
 
   if (movements.length === 0) {
     return materialBalanceResultSchema.parse({

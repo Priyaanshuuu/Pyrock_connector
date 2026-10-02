@@ -122,6 +122,39 @@ describe("HTTP tool routes", () => {
     });
   });
 
+  it("logs bounded outcomes without evidence content or caller-provided identities", async () => {
+    vi.stubEnv("PYROCK_DEMO_USER_ID", "demo-supervisor");
+    const log = vi.spyOn(console, "info").mockImplementation(() => {});
+    try {
+      await balancePost(jsonRequest("/api/tools/get_material_balance", {
+        siteId: "site-b", materialId: "cement", note: "secret request text",
+      }, { "x-user-id": "forged-user" }));
+      await evidencePost(jsonRequest("/api/tools/get_delivery_evidence", {
+        evidenceId: "evidence-a-message",
+      }));
+      await balancePost(jsonRequest("/api/tools/get_material_balance", {
+        siteId: "site-a", materialId: "steel",
+      }));
+      const outcomes = log.mock.calls.map(([line]) => JSON.parse(String(line)));
+      expect(outcomes).toHaveLength(3);
+      expect(outcomes[0]).toMatchObject({
+        event: "tool_outcome", tool: "get_material_balance", userId: "demo-supervisor",
+        siteId: null, status: 400, outcome: "invalid_input", retryable: false,
+      });
+      expect(outcomes[1]).toMatchObject({
+        event: "tool_outcome", tool: "get_delivery_evidence", userId: "demo-supervisor",
+        status: 200, outcome: "ok",
+      });
+      expect(outcomes[1].latencyMs).toEqual(expect.any(Number));
+      expect(outcomes[2]).toMatchObject({
+        siteId: "site-a", status: 200, outcome: "missing_records",
+      });
+      expect(JSON.stringify(outcomes)).not.toMatch(/secret request text|forged-user|content|cookie/i);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
   it("maps upstream and malformed results without exposing internal errors", async () => {
     const upstream = createToolPostHandler(async () => ({
       ok: false, error: { code: "upstream_failure", message: "Retry later", retryable: true },

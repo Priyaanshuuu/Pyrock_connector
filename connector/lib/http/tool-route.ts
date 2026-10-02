@@ -65,33 +65,60 @@ type Tool = (adapter: DataAdapter, access: DemoAccess, input: unknown) => Promis
 
 export function createToolPostHandler(tool: Tool, resultSchema: z.ZodType) {
   return async function POST(request: Request): Promise<Response> {
+    const startedAt = performance.now();
+    const toolName = new URL(request.url).pathname.split("/").at(-1) ?? "unknown";
+    const userId = readDemoIdentity(request) ?? null;
+    let siteId: string | null = null;
+    function respond(result: ToolFailure | { ok: true; data?: unknown }, status: number): Response {
+      let outcome = result.ok ? "ok" : result.error.code;
+      if (result.ok && result.data && typeof result.data === "object" && "balance" in result.data) {
+        const balance = result.data.balance;
+        if (balance && typeof balance === "object" && "state" in balance &&
+          balance.state === "unavailable" && "reason" in balance && typeof balance.reason === "string") {
+          outcome = balance.reason;
+        }
+      }
+      // Structured, bounded outcome only: never log request bodies, evidence, cookies, or error details.
+      console.info(JSON.stringify({
+        event: "tool_outcome", tool: toolName, userId, siteId,
+        status, outcome,
+        retryable: result.ok ? false : result.error.retryable,
+        latencyMs: Math.round(performance.now() - startedAt),
+      }));
+      return jsonResponse(result, status);
+    }
     const contentType = request.headers.get("content-type") ?? "";
     if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
-      return jsonResponse(failure("invalid_input", "Content-Type must be application/json."), 415);
+      return respond(failure("invalid_input", "Content-Type must be application/json."), 415);
     }
     const body = await readJsonBody(request);
     if (body === oversizedBody) {
-      return jsonResponse(failure("invalid_input", "JSON request body is too large."), 413);
+      return respond(failure("invalid_input", "JSON request body is too large."), 413);
     }
     if (body === invalidBody) {
-      return jsonResponse(failure("invalid_input", "Provide a valid JSON request body."), 400);
+      return respond(failure("invalid_input", "Provide a valid JSON request body."), 400);
     }
-
     try {
       // The browser sends only an opaque session token; identity stays on the server.
       const adapter = createSampleAdapter();
-      const access = createDemoAccess(adapter, () => readDemoIdentity(request));
+      const access = createDemoAccess(adapter, () => userId);
       const result = await tool(adapter, access, body);
       const parsed = resultSchema.safeParse(result);
       if (!parsed.success) {
         const invalidResult = failure("data_unavailable", "Tool result could not be validated.");
-        return jsonResponse(invalidResult, statusFor(invalidResult));
+        return respond(invalidResult, statusFor(invalidResult));
       }
       const envelope = parsed.data as { ok: boolean; error?: ToolFailure["error"] };
-      return jsonResponse(parsed.data, statusFor(envelope));
+      if (envelope.ok && parsed.data && typeof parsed.data === "object" && "data" in parsed.data) {
+        const data = parsed.data.data;
+        if (data && typeof data === "object" && "siteId" in data && typeof data.siteId === "string") {
+          siteId = data.siteId;
+        }
+      }
+      return respond(parsed.data as ToolFailure | { ok: true; data?: unknown }, statusFor(envelope));
     } catch {
       const unavailable = failure("data_unavailable", "Tool result could not be produced.");
-      return jsonResponse(unavailable, statusFor(unavailable));
+      return respond(unavailable, statusFor(unavailable));
     }
   };
 }

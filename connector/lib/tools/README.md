@@ -25,3 +25,9 @@ Step 06 adds `getDeliveryEvidence(adapter, access, input)`. It accepts only an e
 A permitted result contains only the evidence record's ID, parent delivery ID, kind, title, content, and timestamp, plus a source reference, update time, and sample-data warning. Completed deliveries can have evidence too. Evidence content is returned as untrusted source text; it is never executed or treated as instructions. No public document link is created.
 
 Missing evidence, a missing parent, an unlinked evidence record, and inaccessible or revoked site access all return the same `not_found` response, `Evidence is unavailable.`, so guessed IDs do not disclose other sites' records. Missing identity returns `unauthenticated`; malformed records return `data_unavailable`; adapter failures return a retryable `upstream_failure`. Later HTTP and browser layers must preserve these boundaries and render evidence content as text.
+
+## Freshness and failures
+
+Step 09 treats a source as stale only when its latest known timestamp is **more than 48 hours old** at request time. The material, open-delivery, and evidence tools add a warning while preserving the original `updatedAt` and source timestamps. A missing timestamp produces no stale warning; it remains visibly unavailable rather than implying freshness. This threshold is a prototype review policy, not a claim about Pyrock's operational service level.
+
+No movement records yield unavailable stock, never numeric zero. Malformed records and unsafe arithmetic are non-retryable `data_unavailable`; retrieval failures are retryable `upstream_failure`. Missing or inaccessible evidence shares one safe `not_found` result. The browser shows the tool's error text and retry guidance only when `retryable` is true.

@@ -12,6 +12,7 @@ import {
 } from "../contracts";
 import type { DemoAccess } from "../access/demo-access";
 import type { DataAdapter } from "../data/adapter";
+import { staleWarning } from "./freshness";
 
 function failure(
   code: ToolFailure["error"]["code"],
@@ -113,6 +114,9 @@ export async function listPendingDeliveries(
   }
 
   const warnings = adapter.mode === "sample" ? [adapter.label] : [];
+  const updatedAt = latestTimestamp(open);
+  const stale = staleWarning(updatedAt);
+  if (stale) warnings.push(stale);
   if (open.length === 0) warnings.push("No open deliveries were found; this says nothing about stock on hand.");
   if (evidenceUnavailable) warnings.push("Some supporting evidence references are unavailable.");
   if (deliveries.some((delivery) => delivery.remainingQuantity === 0)) {
@@ -128,7 +132,7 @@ export async function listPendingDeliveries(
       label: `Open ${delivery.materialId} delivery — ${delivery.expectedQuantity - delivery.receivedQuantity} ${delivery.unit} remaining`,
       recordedAt: delivery.updatedAt,
     })),
-    updatedAt: latestTimestamp(open),
+    updatedAt,
     warnings,
   });
 }

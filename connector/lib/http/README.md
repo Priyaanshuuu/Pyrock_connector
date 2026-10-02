@@ -35,6 +35,8 @@ The balance response is `200` with `ok: true`, `data.balance: { state: "recorded
 
 The response body always uses the same `ok` envelope regardless of status. Evidence missing and inaccessible IDs intentionally share `404` and the same safe message. The route helper validates the final tool result before sending it. Route modules contain only imports and shared handler wiring; tool validation and access checks remain in plain TypeScript.
 
+Step 09 writes one JSON `tool_outcome` line to server stdout for each tool request. Fields are `tool`, server-established `userId` (or `null`), authorized `siteId` when the successful result includes one (otherwise `null`), HTTP `status`, `outcome`, `retryable`, and `latencyMs`. No request body, cookie, evidence content, source label, or exception text is logged. Evidence outcomes have `siteId: null` to avoid an extra record read; denied requests also have no authorized site. These lines are prototype operational logs, not an audit trail or monitoring platform.
+
 These public prototype endpoints expose only fictional records. `PYROCK_DEMO_USER_ID` remains a server-process fallback for API checks; browser sessions are local demo state, not production authentication. Do not deploy them with customer data. The selected assistant and live API remain later steps.
 
 Run `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` from `connector/`. The HTTP tests invoke the exported Route Handlers with Web `Request` objects; the production build verifies that Next.js registers the three routes.
