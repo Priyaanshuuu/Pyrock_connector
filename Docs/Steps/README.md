@@ -25,10 +25,10 @@ This folder is the implementation plan for the read-only connector proposed in [
 
 ## Integration steps requiring external decisions or access
 
-- [ ] **11 — [Selected assistant integration](11-assistant-integration.md)**: implement the selected client's documented connector format and test it in that client.
+- [x] **11 — [Selected assistant integration](11-assistant-integration.md)**: implement the ChatGPT Plus demo MCP connection; owner accepted with in-client verification deferred.
 - [ ] **12 — [Approved Pyrock data adapter](12-live-pyrock-adapter.md)**: connect the approved Pyrock API and permission model to the same tools.
 
-Step 11 now targets a fictional ChatGPT Plus developer-mode demo because Dots requires an eligible plan. The local MCP endpoint still needs HTTPS reachability and an in-client test before Step 11 can be accepted. Dots can be evaluated later. Step 12 separately requires an approved Pyrock API and permission model. The prototype in steps 1–10 needs neither live customer data nor an LLM.
+Step 11 was accepted by Priyanshu on October 2, 2026 as a fictional ChatGPT Plus developer-mode demo. The temporary HTTPS MCP endpoint passed remote initialization, three-tool discovery, and fictional tool calls; a test inside Priyanshu's ChatGPT account has not been reported, so that client behavior remains unverified. Dots can be evaluated later. Step 12 separately requires an approved Pyrock API and permission model. The prototype in steps 1–10 needs neither live customer data nor an LLM.
 
 ## Rules that apply throughout
 
