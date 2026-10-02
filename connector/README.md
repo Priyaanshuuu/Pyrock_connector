@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Pyrock connector prototype
 
-## Getting Started
+This is a **read-only demo with fictional sample data**. It shows how a site-scoped assistant connector could answer three questions: recorded material balance, pending deliveries, and supporting delivery evidence. It does not connect to a Pyrock API or any external assistant.
 
-First, run the development server:
+## Run the demo
 
-```bash
+Use Node.js 20.9 or newer. From this `connector/` directory:
+
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`. Choose **Fictional owner**, **Fictional Site A**, and **Cement**. The recorded balance is **250 bags** (100 opening + 450 receipt − 300 usage). One open delivery has **50 bags still expected**; that quantity is separate from stock on hand. Open its fictional message evidence. Choose **Steel** to see an unavailable balance rather than a false zero. Choose **Fictional supervisor** and use **Try Site B access** to see a denied request; the owner can select Site B and see its 60-bag recorded balance.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The dated sample records are fixed at October 1, 2026. A result with a known latest source timestamp more than 48 hours old displays a stale warning and its original update time. A missing timestamp is shown as unavailable. All records and evidence are fictional; nothing here is a current site reading.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API and contracts
 
-## Learn More
+The browser and direct clients use three `POST` endpoints. Send `Content-Type: application/json`; request bodies are limited to 8 KiB. The browser selects one of two fictional reviewers through `/api/demo/session`, which sets a signed, expiring, HttpOnly cookie. For direct local API calls without a cookie, set the server process variable `PYROCK_DEMO_USER_ID=demo-owner` or `demo-supervisor` before starting the server. A caller-supplied user ID does not establish identity.
 
-To learn more about Next.js, take a look at the following resources:
+| Tool endpoint | JSON input | Success data |
+| --- | --- | --- |
+| `/api/tools/get_material_balance` | `{"siteId":"site-a","materialId":"cement"}` | Recorded quantity and unit, or an explicit unavailable reason |
+| `/api/tools/list_pending_deliveries` | `{"siteId":"site-a","materialId":"cement"}`; material ID optional | Open deliveries, expected/received/remaining quantities, and evidence IDs |
+| `/api/tools/get_delivery_evidence` | `{"evidenceId":"evidence-a-message"}` | Permitted fictional evidence content and parent delivery ID |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Every successful tool result has `ok: true`, `data`, `sources`, `updatedAt` (possibly `null`), and `warnings`. Failures have `ok: false` and `error: {code, message, retryable}`. Missing movement records return a successful **unavailable** balance with no quantity. They never return numeric zero unless recorded movements calculate zero. Denied sites return `403`; missing and inaccessible evidence IDs share the same `404` response so an ID cannot reveal another site's records. Retrieval failures are retryable `502`; malformed or unsafe source data is non-retryable `503`. See the [full schemas](lib/contracts/README.md) and [HTTP status mapping](lib/http/README.md).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The server writes one JSON `tool_outcome` line per tool request with tool name, server-established user, authorized site when available, status, outcome, retryability, and latency. It omits cookies, request bodies, source labels, and evidence content. The [failure policy](lib/tools/README.md#freshness-and-failures) defines the 48-hour threshold.
 
-## Deploy on Vercel
+## Verify
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+From `connector/` run:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sh
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+Tests cover sample arithmetic and zero versus missing records, separation of pending deliveries, two reviewer permissions, independent evidence authorization, malformed records, adapter failures, request validation, stale warnings, safe outcome logs, and signed demo sessions. A production build verifies that Next.js registers the page and routes. The [step checklist](../Docs/Steps/README.md) tracks reviewer acceptance separately from implementation.
+
+## Boundaries and known limits
+
+The [data adapter interface](lib/data/adapter.ts) separates retrieval from the plain TypeScript [access checks](lib/access/demo-access.ts) and [tool logic](lib/tools/README.md). The current [sample adapter](lib/data/README.md) returns validated copies of in-memory fictional records. A live adapter would need approved Pyrock endpoints, record definitions, permission enforcement, and authentication before these tools could operate on customer data. The current reviewer selector is public and is **not production authentication**. `PYROCK_DEMO_SESSION_SECRET` is generated at local startup if absent; set a stable private value when running multiple server instances so they can verify the same demo cookies.
+
+This prototype has no external assistant integration, MCP registration, live Pyrock connection, writes, record corrections, supplier messages, or approval actions. The fictional arithmetic does not define live rules for transfers, returns, adjustments, unit conversion, completeness, or precision. Source text is displayed as text and is not an instruction. A successful HTTP demo or build does not establish compatibility with an external assistant.
