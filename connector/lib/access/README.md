@@ -20,7 +20,7 @@ if (!result.ok) return result;
 
 `getIdentity()` returns only the demo user's ID/name. `listPermittedSites()` returns only currently permitted sites. `resolveSite()` accepts exactly one of `{ siteId }` or `{ siteName }`. Names match exactly after whitespace trimming and case folding; partial/fuzzy matches are not supported. Multiple permitted matches produce `ambiguous_site`; select a concrete ID from `listPermittedSites()`.
 
-Requests cannot supply `userId` or their own permissions. The optional identity-provider argument to the factory is trusted server/test wiring and must never be connected directly to request arguments, unsigned cookies, or headers. A future browser demo selector will need a separate controlled server mechanism; production identity belongs to approved authentication.
+Tool requests cannot supply `userId` or their own permissions. The optional identity-provider argument to the factory is trusted server/test wiring and must never be connected directly to request arguments, unsigned cookies, or headers. Step 08 adds a separate fictional reviewer selector backed by an opaque server-held session; production identity still belongs to approved authentication.
 
 The service reloads the current user and allowed site IDs on each call rather than caching access decisions. Forbidden and unknown sites return the same `access_denied` message, without requested names/IDs or other site details. A forbidden ID is rejected before looking up that site. Name resolution fetches only permitted site records. Deleted permitted sites are omitted, malformed adapter records fail closed with `data_unavailable`, and retrieval errors return a safe retryable `upstream_failure`.
 

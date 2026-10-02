@@ -4,6 +4,7 @@ import { toolFailureSchema, type ToolFailure } from "../contracts";
 import { createDemoAccess, type DemoAccess } from "../access/demo-access";
 import { createSampleAdapter } from "../data/sample-adapter";
 import type { DataAdapter } from "../data/adapter";
+import { readDemoIdentity } from "../demo/session";
 
 const maxBodyBytes = 8192;
 const invalidBody = Symbol("invalid body");
@@ -77,9 +78,9 @@ export function createToolPostHandler(tool: Tool, resultSchema: z.ZodType) {
     }
 
     try {
-      // Both instances are created on the server; identity is read from server configuration.
+      // The browser sends only an opaque session token; identity stays on the server.
       const adapter = createSampleAdapter();
-      const access = createDemoAccess(adapter);
+      const access = createDemoAccess(adapter, () => readDemoIdentity(request));
       const result = await tool(adapter, access, body);
       const parsed = resultSchema.safeParse(result);
       if (!parsed.success) {

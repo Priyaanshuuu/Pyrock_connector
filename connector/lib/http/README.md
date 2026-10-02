@@ -1,6 +1,6 @@
 # Prototype HTTP tool endpoints
 
-Step 07 exposes the three existing read-only tools as Next.js Route Handlers. These are JSON HTTP endpoints for the fictional sample demo. They are not MCP, Muse, Dots, or live Pyrock integrations. Every request creates the sample adapter and access service on the server; the service reads `PYROCK_DEMO_USER_ID`. Request bodies, query parameters, cookies, and headers cannot choose the user. Missing or invalid server identity returns `401`.
+Step 07 exposes the three existing read-only tools as Next.js Route Handlers. These are JSON HTTP endpoints for the fictional sample demo. They are not MCP, Muse, Dots, or live Pyrock integrations. Every request creates the sample adapter and access service on the server. Without a demo session, the service reads `PYROCK_DEMO_USER_ID`; missing or invalid identity returns `401`. Step 08 adds a dedicated reviewer selector that issues a signed, expiring demo cookie. Tool request bodies, query parameters, and arbitrary user headers still cannot choose the user.
 
 All endpoints require `POST` with `Content-Type: application/json` and a JSON body no larger than 8 KiB. They return the Step 01 tool result envelope and `Cache-Control: no-store`. Other HTTP methods receive Next.js's method response.
 
@@ -35,6 +35,6 @@ The balance response is `200` with `ok: true`, `data.balance: { state: "recorded
 
 The response body always uses the same `ok` envelope regardless of status. Evidence missing and inaccessible IDs intentionally share `404` and the same safe message. The route helper validates the final tool result before sending it. Route modules contain only imports and shared handler wiring; tool validation and access checks remain in plain TypeScript.
 
-These public prototype endpoints expose only fictional records. The `PYROCK_DEMO_USER_ID` setting selects one identity for the server process, not an authenticated user per browser. Do not deploy them with customer data. Step 08 will add a reviewer interface; the selected assistant and live API remain later steps.
+These public prototype endpoints expose only fictional records. `PYROCK_DEMO_USER_ID` remains a server-process fallback for API checks; browser sessions are local demo state, not production authentication. Do not deploy them with customer data. The selected assistant and live API remain later steps.
 
 Run `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` from `connector/`. The HTTP tests invoke the exported Route Handlers with Web `Request` objects; the production build verifies that Next.js registers the three routes.
