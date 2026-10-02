@@ -21,14 +21,14 @@ This folder is the implementation plan for the read-only connector proposed in [
 - [x] **07 — [HTTP tool endpoints](07-http-tool-endpoints.md)**: expose the shared tool logic through Next.js Route Handlers.
 - [x] **08 — [Sample-data demo interface](08-demo-interface.md)**: build reviewable stock, delivery, and evidence views.
 - [x] **09 — [Failure handling and outcome logging](09-failures-and-logging.md)**: make missing, stale, denied, and failed requests clear and record safe operational outcomes.
-- [ ] **10 — [Prototype verification and documentation](10-prototype-verification.md)**: verify the full flow and document setup, contracts, and limits.
+- [x] **10 — [Prototype verification and documentation](10-prototype-verification.md)**: verify the full flow and document setup, contracts, and limits.
 
 ## Integration steps requiring external decisions or access
 
 - [ ] **11 — [Selected assistant integration](11-assistant-integration.md)**: implement the selected client's documented connector format and test it in that client.
 - [ ] **12 — [Approved Pyrock data adapter](12-live-pyrock-adapter.md)**: connect the approved Pyrock API and permission model to the same tools.
 
-Steps 11 and 12 are separate because the docs do not establish a target assistant, its connector requirements, or access to a Pyrock API. Their prerequisites must be confirmed before those steps start. The prototype in steps 1–10 needs neither live customer data nor an LLM.
+Step 11 now targets a fictional ChatGPT Plus developer-mode demo because Dots requires an eligible plan. The local MCP endpoint still needs HTTPS reachability and an in-client test before Step 11 can be accepted. Dots can be evaluated later. Step 12 separately requires an approved Pyrock API and permission model. The prototype in steps 1–10 needs neither live customer data nor an LLM.
 
 ## Rules that apply throughout
 
