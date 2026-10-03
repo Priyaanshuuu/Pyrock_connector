@@ -1,15 +1,5 @@
-# 04 — Material balance tool
+# 04 — Show recorded material balance
 
-**Depends on:** Steps 01–03. **Source:** [Tool list](../02_Solution_Stack_and_Why.md) and [calculation example](../04_Flow.md).
+The balance tool reads permitted stock movements and returns a quantity, unit, update time, and source references. In the fictional example, Site A has 250 recorded bags of cement.
 
-## Scope
-
-Implement `get_material_balance` as plain TypeScript logic using the adapter and shared access check. For the fictional example, calculate opening stock plus confirmed receipts minus recorded usage. Include quantity, unit, site and material identifiers, last update time, and permitted source references.
-
-Pending deliveries do not increase recorded balance. Keep missing records separate from a recorded zero. Do not assume this simplified demo formula covers live returns, transfers, or adjustments; those definitions belong to step 12.
-
-## Done when
-
-- The example returns 250 cement bags and excludes the pending 50 bags.
-- Permission denial, missing records, and malformed record data are covered by tests.
-- The result identifies its supporting records and update time.
+Pending deliveries are excluded. If stock records are missing, the answer is unavailable rather than zero. A real version must use Pyrock's own rules for returns, transfers, adjustments, and units.

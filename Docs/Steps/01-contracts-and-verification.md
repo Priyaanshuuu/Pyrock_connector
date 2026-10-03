@@ -1,16 +1,5 @@
-# 01 — Contracts and verification setup
+# 01 — Define the tool contracts
 
-**Source:** [Solution stack](../02_Solution_Stack_and_Why.md) and [flow](../04_Flow.md).
+I defined the inputs and results for sites, material records, deliveries, evidence, and the three tools. Each result can carry its source, update time, and an error or warning. Runtime checks reject invalid input and malformed data.
 
-## Scope
-
-Define TypeScript types and runtime schemas for sites, material records, deliveries, evidence references, tool arguments, and tool results. Establish a common result shape for data, sources, timestamps, and errors. Add Zod and a test runner suitable for the shared TypeScript logic.
-
-Record the distinction between an actual recorded zero and unavailable data. Define unit handling and timestamp format; do not invent Pyrock's live inventory rules. Keep these contracts independent of Next.js route code.
-
-## Done when
-
-- The three proposed tools have explicit input and output contracts.
-- Invalid inputs and malformed adapter results can be rejected at runtime.
-- A small meaningful contract test runs through a documented command.
-- No sample records, tool implementations, or API routes are added in this step.
+A recorded zero is different from missing records. The contracts also keep the shared tool logic separate from the Next.js routes. Tests check the main input and result rules.
